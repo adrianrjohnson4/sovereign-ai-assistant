@@ -1,0 +1,6 @@
+__pycache__/
+.env
+*.__pyc
+data/logs/
+data/tasks/sample_input.txt
+ui/react-app/node_modules/
