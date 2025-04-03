@@ -22,6 +22,24 @@ def load_goals():
             return json.load(f)
     return{"weekly_goals": [], "long_term_goals": []}
 
+def explain_task_reason(task, score, goals):
+    task_lower = task.lower()
+    reasons = []
+
+    for keyword, value in KEYWORD_SCORES.items():
+        if keyword in task_lower:
+            reasons.append(f"matched keyword '{keyword}' (+{value})")
+    
+    for goal in goals.get("weekly_goals", []) + goals.get("long_term_goals", []):
+        goal_keywords = goal.lower().split()
+        if any(word in task_lower for word in goal_keywords):
+            reasons.append(f"aligned with goal: \"{goal}\" (+{GOAL_BOOST})")
+            break
+    
+    if not reasons:
+            reasons.append("no strong match, included for completeness")
+    return ", ".join(reasons)    
+
 def score_task(task, goals):
     score = 0
     task_lower = task.lower()
@@ -39,7 +57,9 @@ def score_task(task, goals):
     return score
 
 def prioritize_tasks(task_list, goals):
-    scored_tasks = [(task, score_task(task, goals)) for task in task_list]
+    scored_tasks = [
+        (task, score_task(task, goals), explain_task_reason(task, score_task(task, goals), goals)) 
+        for task in task_list]
     scored_tasks.sort(key=lambda x: x[1], reverse=True)
     return scored_tasks
 
@@ -49,8 +69,8 @@ def write_prioritized_log(scored_tasks):
     log_path = f"data/logs/{today}_prioritized.md"
     with open(log_path, "w") as f:
         f.write(f"# Prioritized task Log for {today}\n\n")
-        for i, (task, score) in enumerate(scored_tasks, 1):
-            f.write(f"{i}. {task} (Score: {score})\n")
+        for i, (task, score, reason) in enumerate(scored_tasks, 1):
+            f.write(f"{i}. {task} (Score: {score}) - {reason}\n")
     return log_path
 
 if __name__ == '__main__':

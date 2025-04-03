@@ -34,8 +34,8 @@ def write_prioritized_log(scored_tasks):
     log_path = f"data/logs/{today}_prioritized.md"
     with open(log_path, "w") as f:
         f.write(f"# Prioritized Task Log for {today}\n\n")
-        for i, (task, score) in enumerate(scored_tasks, 1):
-            f.write(f"{i}. {task} (Score: {score})\n")
+        for i, (task, score, reason) in enumerate(scored_tasks, 1):
+            f.write(f"{i}. {task} (Score: {score}) — {reason}\n")
     return log_path
 
 # --- Pydantic model for input validation ---
