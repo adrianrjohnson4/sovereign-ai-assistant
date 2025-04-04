@@ -48,6 +48,7 @@ function App() {
     <div style={{ maxWidth: 600, margin: "40px auto", fontFamily: "sans-serif" }}>
       <h2>Sovereign Task Prioritizer</h2>
       <TaskEntry />
+      <p>Small Test</p>
       {/*     
       <textarea
         style={{ width: "100%", height: 120 }}
