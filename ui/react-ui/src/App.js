@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import TaskEntry from './components/TaskEntry';
 
 function App() {
   const [message, setMessage] = useState("");
@@ -46,7 +47,8 @@ function App() {
   return (
     <div style={{ maxWidth: 600, margin: "40px auto", fontFamily: "sans-serif" }}>
       <h2>Sovereign Task Prioritizer</h2>
-
+      <TaskEntry />
+      {/*     
       <textarea
         style={{ width: "100%", height: 120 }}
         placeholder="Enter your tasks here, separated by commas or new lines"
@@ -110,6 +112,7 @@ function App() {
           )}
         </div>
       )}
+      */}
     </div>
   )
 }
