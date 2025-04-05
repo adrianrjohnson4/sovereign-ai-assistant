@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function SecondBrain() {
+function SecondBrainForm() {
     const [note, setNote] = useState({
         tag: '',
         summary: '',
@@ -79,4 +79,4 @@ function SecondBrain() {
     );
 }
 
-export default SecondBrain;
+export default SecondBrainForm;
