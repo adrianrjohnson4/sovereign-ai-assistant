@@ -3,3 +3,5 @@ uvicorn
 openapi
 python-dotenv
 firebase-admin
+python-multipart
+pinecone

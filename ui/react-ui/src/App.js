@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import TaskEntry from './components/TaskEntry';
+import SecondBrain from './components/SecondBrain';
 
 function App() {
   const [message, setMessage] = useState("");
@@ -9,6 +10,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [showWhy, setShowWhy] = useState({});
   const [reasons, setReasons] = useState([]);
+  const [activeTab, setActiveTab] = useState('tasks');
 
   const sendMessage = async () => {
     setLoading(true);
@@ -46,9 +48,16 @@ function App() {
 
   return (
     <div style={{ maxWidth: 600, margin: "40px auto", fontFamily: "sans-serif" }}>
-      <h2>Sovereign Task Prioritizer</h2>
-      <TaskEntry />
-      <p>Small Test</p>
+      <h2>Sovereign AI</h2>
+      <div style={{ display: `flex`, gap: `1rem`}}>
+        <button onClick={() => setActiveTab('tasks')}>✅ Tasks</button>
+        <button onClick={() => setActiveTab('brain')}>🧠 Second Brain</button>
+      </div>
+
+      <div style={{ marginTop: `2rem`}}>
+        {activeTab === 'tasks' && <TaskEntry />}
+        {activeTab === 'brain' && <SecondBrain />}
+      </div>      
       {/*     
       <textarea
         style={{ width: "100%", height: 120 }}

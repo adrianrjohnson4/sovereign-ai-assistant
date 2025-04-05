@@ -2,13 +2,14 @@ from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
-from api import task_routes
+from api import task_routes, note_routes
 import os
 
 from agents.prioritization_agent import prioritize_tasks, load_goals
 
 app = FastAPI()
 app.include_router(task_routes.router)
+app.include_router(note_routes.router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -63,6 +64,5 @@ def chat(input: TaskInput):
         "message": f"✅ {len(tasks)} tasks logged and prioritized.",
         "log_file": log_path,
         "prioritize_log": prioritize_log,
-        "prioritize_tasks": prioritized
-        
+        "prioritize_tasks": prioritized 
     }

@@ -1,13 +1,19 @@
 import firebase_admin
-from firebase_admin import credentials, firestore
+from firebase_admin import credentials, firestore, storage
+from uuid import uuid4
 from datetime import datetime
 
 # Initialize Firebase only once
 if not firebase_admin._apps:
     cred = credentials.Certificate("api/firebase_credentials.json")
-    firebase_admin.initialize_app(cred)
+    firebase_admin.initialize_app(cred, {
+        'storageBucket': 'sovereignagent-9241b.firebasestorage.app'
+    })
 
     db = firestore.client()
+    bucket = storage.bucket()
+
+    # --- Task Methods Section ---
 
     def add_task(task_text, priority=1, source="manual"):
         task_data = {
@@ -38,3 +44,17 @@ if not firebase_admin._apps:
         tasks = db.collection("tasks").where("isTop3Today", "==", True).stream()
         for doc in tasks:
             db.collection("tasks").document(doc.id).update({"isTop3Today": False})
+
+    # --- Strorage Section ---
+    def save_note_to_firestore(notes_data):
+        notes_ref = db.collection("second_brain_notes")
+        notes_ref.add(notes_data)
+
+    async def upload_file_to_storage(file):
+        extension = file.filename.split(".")[-1]
+        blob_name = f"notes/{uuid4()}.{extension}"
+        blob = bucket.blob(blob_name)
+        content = await file.read()
+        blob.upload_from_string(content, content_type=file.content_type)
+        blob.make_public()
+        return blob.public_url
