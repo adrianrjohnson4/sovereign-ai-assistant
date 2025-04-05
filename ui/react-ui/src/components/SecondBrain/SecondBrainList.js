@@ -1,31 +1,27 @@
 // --- This File lists the Notes from Firebase ---
-import React, { useState } from 'react';
-
-const mockNotes = [
-    {
-        id: '1',
-        tag: 'meeting',
-        summary: 'Weekly ops meeting takeaways',
-        project: 'Internal Sync',
-        url: 'https://example.com/meeting-notes',
-        full_text: 'Discussed Q2 milestones, blocked items, and integration priorities.',
-        fileUrl: 'https://example.com/attached-file.pdf',
-        createdAt: '2025-04-05T17:00:00Z',
-      },
-      {
-        id: '2',
-        tag: 'reflection',
-        summary: 'Deep work productivity insights',
-        project: '',
-        url: '',
-        full_text: 'Realized that time-blocking works best when aligned with ultradian rhythm breaks.',
-        fileUrl: null,
-        createdAt: '2025-04-04T11:30:00Z',
-      }, 
-];
+import React, { useEffect, useState } from 'react';
+import NoteModal from './Notes/NoteModal';
+import { collection, getDocs } from "firebase/firestore";
+import { db } from '../../firebase';
 
 function SecondBrainList() {
     const [expandedId, setExpandedId] = useState(null);
+    const [notes, setNotes] = useState([]);
+    const [selectedNote, setSelectedNote] = useState(null);
+
+    useEffect(() => {
+        async function fetchNotes() {
+            const notesCol = collection(db, "second_brain_notes");
+            const noteSnapshot = await getDocs(notesCol);
+            const noteList = noteSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setNotes(noteList);
+        }
+
+        fetchNotes();
+    }, []);
 
     const toggleExpand = (id) => {
         setExpandedId(expandedId === id ? null : id);
@@ -34,8 +30,12 @@ function SecondBrainList() {
     return (
         <div>
         <h2>🧠 Saved Notes</h2>
-        {mockNotes.map(note => (
-          <div key={note.id} style={{ border: '1px solid #ccc', margin: '1rem 0', padding: '1rem' }}>
+        {notes.map(note => (
+          <div 
+          key={note.id} 
+          style={{ border: '1px solid #ccc', margin: '1rem 0', padding: '1rem', cursor: 'pointer' }}
+          onClick={() => setSelectedNote(note)}
+          >
             <strong>📌 {note.tag.toUpperCase()}</strong> — {note.summary}
             <br />
             <em>{new Date(note.createdAt).toLocaleString()}</em>
@@ -56,6 +56,8 @@ function SecondBrainList() {
             )}
           </div>
         ))}
+
+        <NoteModal note={selectedNote} onClose={() => setSelectedNote(null)} />
       </div>
     );
 }
