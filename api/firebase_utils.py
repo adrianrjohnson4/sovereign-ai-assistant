@@ -15,14 +15,15 @@ if not firebase_admin._apps:
 
     # --- Task Methods Section ---
 
-    def add_task(task_text, priority=1, source="manual"):
+    def add_task(task_text, status="todo", scheduledDate="", priority=1, source="manual"):
         task_data = {
             "task": task_text,
-            "status": "To Do",
+            "status": status,
             "priority": priority,
             "source": source,
             "created_at": datetime.utcnow(),
-            "isTop3Today": False
+            "isTop3Today": False,
+            "scheduledDate": scheduledDate
         }
         return db.collection("tasks").add(task_data)
     

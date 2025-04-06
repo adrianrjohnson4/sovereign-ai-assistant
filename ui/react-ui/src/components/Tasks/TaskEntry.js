@@ -2,44 +2,51 @@ import { useState, useEffect } from 'react';
 import FocusTasks from './FocusTasks';
 
 export default function TaskEntry() {
-    const [taskText, setTaskText] = useState("");
-    const [tasks, setTasks] = useState([]);
-    const [project, setProject] = useState("");
-    const [status, setStatus] = useState('todo');
+  const [taskText, setTaskText] = useState("");
+  const [tasks, setTasks] = useState([]);
+  const [project, setProject] = useState("");
+  const [status, setStatus] = useState('todo');
+  const [scheduledDate, setScheduledDate] = useState("");
 
-    const handleAddTask = async () => {
-        if (!taskText.trim()) return;
+  const handleAddTask = async () => {
+    if (!taskText.trim()) return;
 
-        await fetch("http://localhost:8000/add-task", {
-            method: "POST",
-            headers: { "Content-Type": "application/json"},
-            body: JSON.stringify({ 
-              task: taskText, 
-              priority: 1, 
-              source: "manual", 
-              project, 
-              status }),
-        });
+    await fetch("http://localhost:8000/add-task", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        task: taskText,
+        priority: 1,
+        source: "manual",
+        project,
+        status,
+        scheduledDate
+      }),
+    });
 
-        setTaskText("");
-        setProject("");
-        setStatus('todo');
-        fetchTasks();
-    };
+    setTaskText("");
+    setProject("");
+    setStatus('todo');
+    setScheduledDate("");
+    fetchTasks();
+  };
 
-    const fetchTasks = async () => {
-        const res = await fetch("http://localhost:8000/tasks");
-        const data = await res.json();
-        setTasks(data.tasks || []);
-    }
+  const fetchTasks = async () => {
+    const res = await fetch("http://localhost:8000/tasks");
+    const data = await res.json();
+    setTasks(data.tasks || []);
+  }
 
-    useEffect(() => {
-        fetchTasks();
-    }, [])
+  useEffect(() => {
+    fetchTasks();
+  }, [])
 
-    return (
-      <div className="p-4">
-        <FocusTasks tasks={tasks} />
+  return (
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-4">✅ Tasks Dashboard</h2>
+
+      <FocusTasks tasks={tasks} />
+
       <h2 className="text-xl font-bold mb-4">📝 Add Task</h2>
 
       <div className="space-y-3">
@@ -57,6 +64,13 @@ export default function TaskEntry() {
           className="border p-2 w-full"
           value={project}
           onChange={(e) => setProject(e.target.value)}
+        />
+
+        <input
+          type="date"
+          className="border p-2 w-full"
+          value={scheduledDate}
+          onChange={(e) => setScheduledDate(e.target.value)}
         />
 
         <select
@@ -90,11 +104,12 @@ export default function TaskEntry() {
               <div className="text-sm text-gray-600">
                 {task.project && <>📁 Project: {task.project} — </>}
                 Status: {task.status} — Priority: {task.priority}
+                {task.scheduledDate && <> — 📅 {task.scheduledDate}</>}
               </div>
             </li>
           ))}
         </ul>
       )}
     </div>
-    )
+  )
 }
