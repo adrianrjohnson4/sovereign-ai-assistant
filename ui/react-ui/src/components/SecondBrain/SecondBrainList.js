@@ -8,23 +8,33 @@ function SecondBrainList() {
     const [expandedId, setExpandedId] = useState(null);
     const [notes, setNotes] = useState([]);
     const [selectedNote, setSelectedNote] = useState(null);
+    const [refreshKey, setrefreshKey] = useState(0);
 
     useEffect(() => {
-        async function fetchNotes() {
-            const notesCol = collection(db, "second_brain_notes");
-            const noteSnapshot = await getDocs(notesCol);
-            const noteList = noteSnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            setNotes(noteList);
-        }
-
         fetchNotes();
     }, []);
 
+    useEffect(() => {
+        fetchNotes();
+    }, [refreshKey])
+
     const toggleExpand = (id) => {
         setExpandedId(expandedId === id ? null : id);
+    };
+
+    async function fetchNotes() {
+        const notesCol = collection(db, "second_brain_notes");
+        const noteSnapshot = await getDocs(notesCol);
+        const noteList = noteSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        setNotes(noteList)
+    }
+
+    const handleCloseModal = () => {
+        setSelectedNote(null);
+        setrefreshKey(prev => prev + 1)
     };
 
     return (
@@ -57,7 +67,7 @@ function SecondBrainList() {
           </div>
         ))}
 
-        <NoteModal note={selectedNote} onClose={() => setSelectedNote(null)} />
+        <NoteModal note={selectedNote} onClose={handleCloseModal} />
       </div>
     );
 }
