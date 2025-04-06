@@ -37,6 +37,16 @@ export default function TaskEntry() {
     setTasks(data.tasks || []);
   }
 
+  const handleToggleStatus = async(taskId, currentStatus) => {
+    const newStatus = currentStatus === 'done' ? 'todo' : 'done';
+    await fetch(`http://localhost:8000/update-task-status/${taskId}`, {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({ status: newStatus }) 
+    });
+    fetchTasks();
+  };
+
   useEffect(() => {
     fetchTasks();
   }, [])
@@ -100,7 +110,13 @@ export default function TaskEntry() {
         <ul className="space-y-2">
           {tasks.map((task) => (
             <li key={task.id} className="border p-3 rounded">
-              <strong>🧠 {task.task}</strong>
+              <input
+                  type="checkbox"
+                  checked={task.status === 'done'}
+                  onChange={() => handleToggleStatus(task.id, task.status)}
+                />
+                {task.status === 'done' ? <strong style={{textDecoration:'line-through',  color: '#6B7280'}}>🧠 {task.task}</strong> : <strong>🧠 {task.task}</strong>}
+
               <div className="text-sm text-gray-600">
                 {task.project && <>📁 Project: {task.project} — </>}
                 Status: {task.status} — Priority: {task.priority}
