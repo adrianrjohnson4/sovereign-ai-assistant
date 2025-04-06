@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import FocusTasks from './FocusTasks';
 
 export default function TaskEntry() {
     const [taskText, setTaskText] = useState("");
@@ -38,6 +39,7 @@ export default function TaskEntry() {
 
     return (
       <div className="p-4">
+        <FocusTasks tasks={tasks} />
       <h2 className="text-xl font-bold mb-4">📝 Add Task</h2>
 
       <div className="space-y-3">
