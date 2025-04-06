@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import TaskEntry from './components/TaskEntry';
+import TaskEntry from './components/Tasks/TaskEntry';
 import SecondBrainForm from './components/SecondBrain/SecondBrainForm';
 import SecondBrainList from './components/SecondBrain/SecondBrainList';
 
