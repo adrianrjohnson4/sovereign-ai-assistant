@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 export default function TaskEntry() {
     const [taskText, setTaskText] = useState("");
     const [tasks, setTasks] = useState([]);
+    const [project, setProject] = useState("");
+    const [status, setStatus] = useState('todo');
 
     const handleAddTask = async () => {
         if (!taskText.trim()) return;
@@ -10,10 +12,17 @@ export default function TaskEntry() {
         await fetch("http://localhost:8000/add-task", {
             method: "POST",
             headers: { "Content-Type": "application/json"},
-            body: JSON.stringify({ task: taskText, priority: 1, source: "manual" })
+            body: JSON.stringify({ 
+              task: taskText, 
+              priority: 1, 
+              source: "manual", 
+              project, 
+              status }),
         });
 
         setTaskText("");
+        setProject("");
+        setStatus('todo');
         fetchTasks();
     };
 
@@ -28,29 +37,62 @@ export default function TaskEntry() {
     }, [])
 
     return (
-        <div className="p-4">
-      <h2 className="text-xl font-bold mb-2">Add Task:</h2>
-      <div className="flex gap-2 mb-4">
+      <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">📝 Add Task</h2>
+
+      <div className="space-y-3">
         <input
           type="text"
-          className="border p-2 flex-grow"
           placeholder="What do you want to do?"
+          className="border p-2 w-full"
           value={taskText}
           onChange={(e) => setTaskText(e.target.value)}
         />
-        <button onClick={handleAddTask} className="bg-blue-600 text-white px-4 py-2 rounded">
-          Add
+
+        <input
+          type="text"
+          placeholder="Optional: Project or Tag"
+          className="border p-2 w-full"
+          value={project}
+          onChange={(e) => setProject(e.target.value)}
+        />
+
+        <select
+          className="border p-2 w-full"
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+        >
+          <option value="todo">To Do</option>
+          <option value="in progress">In Progress</option>
+          <option value="done">Done</option>
+        </select>
+
+        <button
+          onClick={handleAddTask}
+          className="bg-blue-600 text-white px-4 py-2 rounded w-full"
+        >
+          ➕ Add Task
         </button>
       </div>
 
-      <h3 className="text-lg font-semibold mb-2">All Tasks</h3>
-      <ul className="space-y-2">
-        {tasks.map((task) => (
-          <li key={task.id} className="border p-2 rounded">
-            ✅ {task.task} — {task.status} (Priority: {task.priority})
-          </li>
-        ))}
-      </ul>
+      <hr className="my-6" />
+
+      <h3 className="text-lg font-semibold mb-2">🗂️ All Tasks</h3>
+      {tasks.length === 0 ? (
+        <p className="text-gray-500">No tasks yet. Add one to get started.</p>
+      ) : (
+        <ul className="space-y-2">
+          {tasks.map((task) => (
+            <li key={task.id} className="border p-3 rounded">
+              <strong>🧠 {task.task}</strong>
+              <div className="text-sm text-gray-600">
+                {task.project && <>📁 Project: {task.project} — </>}
+                Status: {task.status} — Priority: {task.priority}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
     )
 }
