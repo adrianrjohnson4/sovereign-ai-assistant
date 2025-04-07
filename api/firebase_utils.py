@@ -1,7 +1,7 @@
 import firebase_admin
 from firebase_admin import credentials, firestore, storage
 from uuid import uuid4
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Initialize Firebase only once
 if not firebase_admin._apps:
@@ -21,7 +21,7 @@ if not firebase_admin._apps:
             "status": status,
             "priority": priority,
             "source": source,
-            "created_at": datetime.utcnow(),
+            "created_at": datetime.now(datetime.timezone.utc),
             "isTop3Today": False,
             "scheduledDate": scheduledDate
         }
@@ -46,7 +46,7 @@ if not firebase_admin._apps:
         for doc in tasks:
             db.collection("tasks").document(doc.id).update({"isTop3Today": False})
 
-    # --- Strorage Section ---
+    # --- Storage Section ---
     def save_note_to_firestore(notes_data):
         notes_ref = db.collection("second_brain_notes")
         notes_ref.add(notes_data)
@@ -59,3 +59,23 @@ if not firebase_admin._apps:
         blob.upload_from_string(content, content_type=file.content_type)
         blob.make_public()
         return blob.public_url
+    
+    # --- Calendar Auto Scheduling ---
+    def get_unscheduled_tasks():
+        tasks = db.collection("tasks")\
+            .where("scheduledDate", "==", "")\
+            .where("status", "in", ["todo", "in progress"])\
+            .order_by("priority", direction=firestore.Query.DESCENDING)\
+            .stream()
+        return[{**doc.to_dict(), "id": doc.id} for doc in tasks]
+    
+    def generate_open_slots(days_ahead=5):
+        today = datetime.now(datetime.timezone.utc).date()
+        slots = []
+        for i in range(days_ahead):
+            slot = today + timedelta(days=i)
+            slots.append(str(slot))
+        return slots
+    
+    def update_task_field(task_id, field, value):
+        db.collection("tasks").document(task_id).update({field: value})

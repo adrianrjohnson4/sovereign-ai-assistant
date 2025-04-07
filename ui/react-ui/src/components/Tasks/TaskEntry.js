@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import FocusTasks from './FocusTasks';
+import TaskCalendar from '../Calendar/TaskCalendar';
 
 export default function TaskEntry() {
   const [taskText, setTaskText] = useState("");
@@ -37,15 +38,23 @@ export default function TaskEntry() {
     setTasks(data.tasks || []);
   }
 
-  const handleToggleStatus = async(taskId, currentStatus) => {
+  const handleToggleStatus = async (taskId, currentStatus) => {
     const newStatus = currentStatus === 'done' ? 'todo' : 'done';
     await fetch(`http://localhost:8000/update-task-status/${taskId}`, {
-     method: 'POST',
-     headers: { 'Content-Type': 'application/json' },
-     body: JSON.stringify({ status: newStatus }) 
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
     });
     fetchTasks();
   };
+
+  const autoScheduleTasks = async () => {
+    await fetch("http://localhost:8000/auto-schedule-tasks", {
+      method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+    });
+    fetchTasks();
+  }
 
   useEffect(() => {
     fetchTasks();
@@ -56,6 +65,7 @@ export default function TaskEntry() {
       <h2 className="text-2xl font-bold mb-4">✅ Tasks Dashboard</h2>
 
       <FocusTasks tasks={tasks} />
+      <TaskCalendar tasks={tasks} autoScheduleTasks={autoScheduleTasks} />
 
       <h2 className="text-xl font-bold mb-4">📝 Add Task</h2>
 
@@ -111,11 +121,11 @@ export default function TaskEntry() {
           {tasks.map((task) => (
             <li key={task.id} className="border p-3 rounded">
               <input
-                  type="checkbox"
-                  checked={task.status === 'done'}
-                  onChange={() => handleToggleStatus(task.id, task.status)}
-                />
-                {task.status === 'done' ? <strong style={{textDecoration:'line-through',  color: '#6B7280'}}>🧠 {task.task}</strong> : <strong>🧠 {task.task}</strong>}
+                type="checkbox"
+                checked={task.status === 'done'}
+                onChange={() => handleToggleStatus(task.id, task.status)}
+              />
+              {task.status === 'done' ? <strong style={{ textDecoration: 'line-through', color: '#6B7280' }}>🧠 {task.task}</strong> : <strong>🧠 {task.task}</strong>}
 
               <div className="text-sm text-gray-600">
                 {task.project && <>📁 Project: {task.project} — </>}
@@ -126,6 +136,8 @@ export default function TaskEntry() {
           ))}
         </ul>
       )}
+
+      
     </div>
   )
 }

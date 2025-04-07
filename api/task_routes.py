@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Request,  Body, Path
 from pydantic import BaseModel
-from api.firebase_utils import add_task, get_all_tasks, update_task_status
+from api.firebase_utils import (
+    add_task, get_all_tasks, update_task_status, 
+    get_unscheduled_tasks, update_task_field, generate_open_slots)
 
 router = APIRouter()
 
@@ -39,3 +41,18 @@ def fetch_tasks():
 def update_task(task_id: str = Path(...), request: UpdateStatusRequest = Body(...)):
     update_task_status(task_id, request.status)
     return {"message": f"✅ Task {task_id} updated to {request.status}"}
+
+# --- Route to auto Schedule tasks ---
+@router.post("/auto-schedule-tasks")
+def auto_schedule_tasks():
+    tasks = get_unscheduled_tasks() # Only where scheduleDate is empty
+    avaialable_slots = generate_open_slots() # I can hardcode for now: 3 slots per day, 9-5
+    scheduled_tasks = []
+
+    for i, task in enumerate(tasks):
+        if i < len(avaialable_slots):
+            task_id = task["id"]
+            slot = avaialable_slots[i]
+            update_task_field(task_id, "scheduledDate", slot)
+            scheduled_tasks.append(task_id)
+    return {"scheduled": scheduled_tasks}
