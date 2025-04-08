@@ -1,7 +1,7 @@
 import firebase_admin
 from firebase_admin import credentials, firestore, storage
 from uuid import uuid4
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone, time
 
 # Initialize Firebase only once
 if not firebase_admin._apps:
@@ -21,10 +21,18 @@ if not firebase_admin._apps:
             "status": status,
             "priority": priority,
             "source": source,
-            "created_at": datetime.now(datetime.timezone.utc),
+            "created_at": datetime.now(timezone.utc),
             "isTop3Today": False,
-            "scheduledDate": scheduledDate
+            "scheduledDate": scheduledDate or ""
         }
+        if scheduledDate:
+            if isinstance(scheduledDate, str):
+                scheduledDate = datetime.fromisoformat(scheduledDate)
+            elif isinstance(scheduledDate, date):
+                scheduledDate = datetime.combine(scheduledDate, time.min)
+            task_data["scheduledDate"] = scheduledDate
+
+
         return db.collection("tasks").add(task_data)
     
     def get_all_tasks():
@@ -63,19 +71,35 @@ if not firebase_admin._apps:
     # --- Calendar Auto Scheduling ---
     def get_unscheduled_tasks():
         tasks = db.collection("tasks")\
-            .where("scheduledDate", "==", "")\
             .where("status", "in", ["todo", "in progress"])\
             .order_by("priority", direction=firestore.Query.DESCENDING)\
             .stream()
-        return[{**doc.to_dict(), "id": doc.id} for doc in tasks]
+
+        result = []
+        for doc in tasks:
+            data = doc.to_dict()
+            task_id = doc.id
+
+            scheduled = data.get("scheduledDate")
+            print(f"📝 Task: {data['task']}, ID: {task_id}, scheduledDate: {repr(scheduled)}")
+            if not scheduled or isinstance(scheduled, str):
+                result.append({**data, "id": doc.id})
+
+        print(f"➡️ Found {len(result)} unscheduled tasks")
+        return result
     
     def generate_open_slots(days_ahead=5):
-        today = datetime.now(datetime.timezone.utc).date()
+        today = datetime.now(timezone.utc).date() 
         slots = []
         for i in range(days_ahead):
             slot = today + timedelta(days=i)
-            slots.append(str(slot))
+            slots.append(date_to_datetime(slot))
         return slots
     
     def update_task_field(task_id, field, value):
         db.collection("tasks").document(task_id).update({field: value})
+
+    # --- Convert datetime.date → datetime.datetime ---
+    def date_to_datetime(d):
+        return datetime.combine(d, time.min)
+  

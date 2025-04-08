@@ -45,14 +45,29 @@ def update_task(task_id: str = Path(...), request: UpdateStatusRequest = Body(..
 # --- Route to auto Schedule tasks ---
 @router.post("/auto-schedule-tasks")
 def auto_schedule_tasks():
-    tasks = get_unscheduled_tasks() # Only where scheduleDate is empty
-    avaialable_slots = generate_open_slots() # I can hardcode for now: 3 slots per day, 9-5
+    tasks = get_unscheduled_tasks()
+    print(f"✅ Step 1 — Found {len(tasks)} unscheduled tasks.")
+
+    for task in tasks:
+        print("    •", task["task"], "| status:", task["status"], "| scheduledDate:", task.get("scheduledDate"))
+
+    available_slots = generate_open_slots()
+    print(f"✅ Step 2 — Generated {len(available_slots)} slots: {available_slots}")
+
     scheduled_tasks = []
 
     for i, task in enumerate(tasks):
-        if i < len(avaialable_slots):
+        if i < len(available_slots):
             task_id = task["id"]
-            slot = avaialable_slots[i]
-            update_task_field(task_id, "scheduledDate", slot)
-            scheduled_tasks.append(task_id)
+            slot = available_slots[i]
+
+            print(f"⏳ Step 3 — Assigning slot '{slot}' to task '{task['task']}' (ID: {task_id})")
+
+            try:
+                update_task_field(task_id, "scheduledDate", slot)
+                print(f"✅ Step 4 — Updated task {task_id} with scheduledDate: {slot}")
+                scheduled_tasks.append(task_id)
+            except Exception as e:
+                print(f"❌ Error updating task {task_id}: {e}")
+
     return {"scheduled": scheduled_tasks}

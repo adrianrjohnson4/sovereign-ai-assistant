@@ -56,6 +56,13 @@ export default function TaskEntry() {
     fetchTasks();
   }
 
+  const formatDatePretty = (isoString) => {
+    const [year, month, day] = isoString.split('T')[0].split('-');
+    const date = new Date(Number(year), Number(month) - 1, Number(day));
+    return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+  };
+  
+
   useEffect(() => {
     fetchTasks();
   }, [])
@@ -130,7 +137,7 @@ export default function TaskEntry() {
               <div className="text-sm text-gray-600">
                 {task.project && <>📁 Project: {task.project} — </>}
                 Status: {task.status} — Priority: {task.priority}
-                {task.scheduledDate && <> — 📅 {task.scheduledDate}</>}
+                {task.scheduledDate && <> — 📅 {formatDatePretty(task.scheduledDate)}</>}
               </div>
             </li>
           ))}

@@ -5,6 +5,8 @@ import 'react-big-calendar/lib/css/react-big-calendar.css'
 
 const localizer = momentLocalizer(moment);
 
+
+
 export default function TaskCalendar({ tasks, autoScheduleTasks }) {
     const events = tasks
         .filter(task => task.scheduledDate)
@@ -16,35 +18,29 @@ export default function TaskCalendar({ tasks, autoScheduleTasks }) {
             allDay: true,
         }));
 
-        const events2 = [{
-            id: '123',
-            title: 'test task',
-            start: parseDateLocal("2025-04-06"),
-            end: parseDateLocal("2025-04-06"),
-            allDay: true,
-        }]
+    function parseDateLocal(isoString) {
+        const date = new Date(isoString);
+        const localISO = date.toISOString().split('T')[0]; // "2025-04-08"
+        const parts = localISO.split('-');
+        return new Date(parts[0], parts[1] - 1, parts[2]);
+    };
 
-    useEffect(() => {
-        console.log("This is tasks", tasks.map(t => t.scheduledDate))
-        console.log("This is events2", events2)
-    })
-
-    function parseDateLocal(dateStr) {
-        const [year, month, day] = dateStr.split("-").map(Number);
-        return new Date(year, month - 1, day); // JS months are 0-based
-      }
-
-        return (
-            <div className="p-4">
+    return (
+        <div className="p-4">
             <h2 className="text-xl font-bold mb-4">🗓️ Calendar View</h2>
             <Calendar
-              localizer={localizer}
-              events={events}
-              startAccessor="start"
-              endAccessor="end"
-              style={{ height: 500 }}
+                events={events}
+                views={['month', 'agenda']}
+                defaultView="month"
+                startAccessor="start"
+                endAccessor="end"
+                localizer={localizer}
+                allDayAccessor={() => true}
+                style={{ height: 500 }}
+                // Optional formatting tweak:
+                formats={{ dayFormat: (date, culture, localizer) => localizer.format(date, 'MMM dd') }}
             />
             <button onClick={autoScheduleTasks}>Auto Schedule Tasks</button>
-          </div> 
-        )
+        </div>
+    )
 }
