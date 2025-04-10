@@ -7,7 +7,7 @@ from uuid import uuid4
 from datetime import datetime, timedelta, timezone, time
 
 firebase_base64 = os.getenv("FIREBASE_CREDENTIALS_BASE64")
-firebase_dict = json.leads(base64.b64decode(firebase_base64).decode("utf-8"))
+firebase_dict = json.loads(base64.b64decode(firebase_base64).decode("utf-8"))
 cred = credentials.Certificate(firebase_dict)
 
 # Initialize Firebase only once
