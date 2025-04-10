@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from api.firebase_utils import (
     add_task, get_all_tasks, update_task_status, 
     get_unscheduled_tasks, update_task_field, generate_open_slots)
+from api.task_scoring import get_top_tasks
 
 router = APIRouter()
 
@@ -71,3 +72,9 @@ def auto_schedule_tasks():
                 print(f"❌ Error updating task {task_id}: {e}")
 
     return {"scheduled": scheduled_tasks}
+
+# --- Top 3 Task Ranking ---
+@router.get("/top-tasks")
+def top_tasks():
+    tasks = get_top_tasks()
+    return {"top_tasks": tasks}

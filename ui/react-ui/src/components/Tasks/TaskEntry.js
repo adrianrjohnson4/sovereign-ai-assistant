@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import FocusTasks from './FocusTasks';
 import TaskCalendar from '../Calendar/TaskCalendar';
 
@@ -8,6 +8,9 @@ export default function TaskEntry() {
   const [project, setProject] = useState("");
   const [status, setStatus] = useState('todo');
   const [scheduledDate, setScheduledDate] = useState("");
+  const [hideCompleted, setHideCompleted] = useState(false);
+  const [sortKey, setSortKey] = useState('date');
+  const [groupByProject, setGroupByProject] = useState(false);
 
   const handleAddTask = async () => {
     if (!taskText.trim()) return;
@@ -51,7 +54,7 @@ export default function TaskEntry() {
   const autoScheduleTasks = async () => {
     await fetch("http://localhost:8000/auto-schedule-tasks", {
       method: 'POST',
-    headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' }
     });
     fetchTasks();
   }
@@ -61,7 +64,22 @@ export default function TaskEntry() {
     const date = new Date(Number(year), Number(month) - 1, Number(day));
     return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
   };
-  
+
+  const filteredTasks = tasks
+    .filter(task => !hideCompleted || task.status !== "done")
+    .sort((a, b) => {
+      if (sortKey === "priority") return b.priority - a.priority;
+      if (sortKey === "project") return (a.project || "").localeCompare(b.project || "");
+      if (sortKey === "date") return (a.scheduledDate || "").localeCompare(b.scheduledDate || "")
+      return 0;
+    })
+
+  const groupedTasks = filteredTasks.reduce((groups, task) => {
+    const key = task.project || "No Project";
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(task);
+    return groups;
+  }, {})
 
   useEffect(() => {
     fetchTasks();
@@ -124,27 +142,91 @@ export default function TaskEntry() {
       {tasks.length === 0 ? (
         <p className="text-gray-500">No tasks yet. Add one to get started.</p>
       ) : (
-        <ul className="space-y-2">
-          {tasks.map((task) => (
-            <li key={task.id} className="border p-3 rounded">
+        <div>
+          <div className="flex gap-4 mb-4 items-center">
+            <label>
               <input
                 type="checkbox"
-                checked={task.status === 'done'}
-                onChange={() => handleToggleStatus(task.id, task.status)}
+                checked={hideCompleted}
+                onChange={() => setHideCompleted(!hideCompleted)}
               />
-              {task.status === 'done' ? <strong style={{ textDecoration: 'line-through', color: '#6B7280' }}>🧠 {task.task}</strong> : <strong>🧠 {task.task}</strong>}
+              Hide Completed
+            </label>
 
-              <div className="text-sm text-gray-600">
-                {task.project && <>📁 Project: {task.project} — </>}
-                Status: {task.status} — Priority: {task.priority}
-                {task.scheduledDate && <> — 📅 {formatDatePretty(task.scheduledDate)}</>}
-              </div>
-            </li>
-          ))}
-        </ul>
+            <select
+              value={sortKey}
+              onChange={(e) => setSortKey(e.target.value)}
+              className='border p-1'>
+              <option value="date">Sort by Date</option>
+              <option value="priority">Sort by Priority</option>
+              <option value="project">Sort by Project</option>
+
+            </select>
+          </div>
+
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={groupByProject}
+              onChange={() => setGroupByProject(!groupByProject)}
+            />
+            Group by Project
+          </label>
+
+          <ul className="space-y-2">
+            {groupByProject ? (
+              Object.entries(groupedTasks).map(([project, tasks]) => (
+                <div key={project} className="mb-4">
+                  <h4 className="text-md font-bold mb-1">📁 {project}</h4>
+                  <ul className="space-y-2">
+                    {tasks.map(task => (
+                      <li key={task.id} className="border p-3 rounded flex items-start gap-2">
+                        <input
+                          type="checkbox"
+                          checked={task.status === 'done'}
+                          onChange={() => handleToggleStatus(task.id, task.status)}
+                        />
+                        <div className={task.status === 'done' ? 'line-through text-gray-500' : ''}>
+                          <strong>🧠 {task.task}</strong>
+                          <div className="text-sm text-gray-600">
+                            Status: {task.status} — Priority: {task.priority}
+                            {task.scheduledDate && <> — 📅 {formatDatePretty(task.scheduledDate)}</>}
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))
+            ) : (
+              <ul className="space-y-2">
+                       {filteredTasks.map((task) => (
+              <li key={task.id} className="border p-3 rounded">
+                <input
+                  type="checkbox"
+                  checked={task.status === 'done'}
+                  onChange={() => handleToggleStatus(task.id, task.status)}
+                />
+                {task.status === 'done' ? <strong style={{ textDecoration: 'line-through', color: '#6B7280' }}>🧠 {task.task}</strong> : <strong>🧠 {task.task}</strong>}
+
+                <div className="text-sm text-gray-600">
+                  {task.project && <>📁 Project: {task.project} — </>}
+                  Status: {task.status} — Priority: {task.priority}
+                  {task.scheduledDate && <> — 📅 {formatDatePretty(task.scheduledDate)}</>}
+                </div>
+              </li>
+            ))}
+              </ul>
+            )}
+
+
+
+          </ul>
+        </div>
+
       )}
 
-      
+
     </div>
   )
 }

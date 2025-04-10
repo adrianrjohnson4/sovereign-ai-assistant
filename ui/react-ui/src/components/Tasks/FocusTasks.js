@@ -1,29 +1,18 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export default function FocusTasks({ tasks = [] }) {
     const [focusTasks, setFocusTasks] = useState([]);
+ 
 
     useEffect(() => {
-        if (!tasks || tasks.length === 0) return;
-
-        const boost = 3;
-
-        // Filter incomplete tasks
-        const pending = tasks.filter(task => task.staus !== "done");
-
-        // Optional: Boost project if high priority
-        const KEY_PROJECTS = ["Lead Intake Tab", "Vertical Integration"];
-        const scored = pending.map(t => ({
-            ...t,
-            boostedScore: t.priority + (KEY_PROJECTS.includes(t.project) ? boost : 0)
-        }));
-
-        // Sort by boosted score
-        const sorted = scored.sort((a, b) => b.boostedScore - a.boostedScore);
-
-        // Pick top 3
-        setFocusTasks(sorted.slice(0, 3));
-    }, [tasks])
+      const fetchTopTasks = async () => {
+        const res = await fetch("http://localhost:8000/top-tasks");
+        const data = await res.json();
+        setFocusTasks(data.top_tasks || []);
+        console.log(data)
+      };
+      fetchTopTasks();
+    }, [])
 
     return (
         <div className="p-4 bg-white rounded shadow">

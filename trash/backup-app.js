@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import TaskEntry from './components/TaskEntry';
 import SecondBrainForm from './components/SecondBrain/SecondBrainForm';
 import SecondBrainList from './components/SecondBrain/SecondBrainList';
+import FocusTasks from '../ui/react-ui/src/components/Tasks/FocusTasks';
 
 function App() {
   const [message, setMessage] = useState("");
@@ -131,3 +132,31 @@ function App() {
 }
 
 export default App;
+
+FocusTasks.js
+   
+    {/*
+      useEffect(() => {
+        if (!tasks || tasks.length === 0) return;
+
+        const boost = 3;
+
+        // Filter incomplete tasks
+        const pending = tasks.filter(task => task.staus !== "done");
+
+        // Optional: Boost project if high priority
+        const KEY_PROJECTS = ["Lead Intake Tab", "Vertical Integration"];
+        const scored = pending.map(t => ({
+            ...t,
+            boostedScore: t.priority + (KEY_PROJECTS.includes(t.project) ? boost : 0)
+        }));
+
+        // Sort by boosted score
+        const sorted = scored.sort((a, b) => b.boostedScore - a.boostedScore);
+
+        // Pick top 3
+        setFocusTasks(sorted.slice(0, 3));
+    }, [tasks])
+
+      
+      */}
