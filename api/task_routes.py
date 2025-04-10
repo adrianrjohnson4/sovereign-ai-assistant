@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Request,  Body, Path
 from pydantic import BaseModel
-from api.firebase_utils import (
+from firebase_utils import (
     add_task, get_all_tasks, update_task_status, 
     get_unscheduled_tasks, update_task_field, generate_open_slots)
-from api.task_scoring import get_top_tasks
+from task_scoring import get_top_tasks
 
 router = APIRouter()
 

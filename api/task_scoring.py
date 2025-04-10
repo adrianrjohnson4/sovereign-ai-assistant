@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from api.firebase_utils import get_all_tasks
+from firebase_utils import get_all_tasks
 
 # My active Projects and goals (I can pull this later from firebase or config)
 ACTIVE_PROJECTS = ["Vertical Integration", "Lead Intake Tab"]

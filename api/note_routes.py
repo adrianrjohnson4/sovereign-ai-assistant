@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, Form, File
-from api.firebase_utils import upload_file_to_storage, save_note_to_firestore
-from api.vector_memory import save_note_to_pinecone
+from firebase_utils import upload_file_to_storage, save_note_to_firestore
+from vector_memory import save_note_to_pinecone
 from firebase_admin import firestore, storage
 from uuid import uuid4
 from datetime import datetime
