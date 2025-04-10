@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone, time
 
 # Initialize Firebase only once
 if not firebase_admin._apps:
-    cred = credentials.Certificate("api/firebase_credentials.json")
+    cred = credentials.Certificate("firebase_credentials.json")S
     firebase_admin.initialize_app(cred, {
         'storageBucket': 'sovereignagent-9241b.firebasestorage.app'
     })
