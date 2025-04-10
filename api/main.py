@@ -5,8 +5,24 @@ from fastapi.middleware.cors import CORSMiddleware
 import task_routes
 import note_routes
 import os
-
+import base64
+import tempfile
+from firebase_admin import credentials, initialize_app
 from agents.prioritization_agent import prioritize_tasks, load_goals
+
+if not firebase_admin._apps:
+    # Read and decode the base64 credentials
+    encoded = os.getenv("FIREBASE_CREDS_BASE64")
+    decoded = base64.b64decode(encoded)
+
+    # Save to temp file
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as tmp:
+        tmp.write(decoded)
+        tmp.flush()
+        cred = credentials.Certificate(tmp.name)
+        initialize_app(cred, {
+            'storageBucket': 'sovereignagent-9241b.firebasestorage.app'
+        })
 
 app = FastAPI()
 app.include_router(task_routes.router)

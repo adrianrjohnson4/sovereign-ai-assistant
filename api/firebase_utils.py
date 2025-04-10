@@ -1,7 +1,14 @@
+import os
+import base64
+import json
 import firebase_admin
 from firebase_admin import credentials, firestore, storage
 from uuid import uuid4
 from datetime import datetime, timedelta, timezone, time
+
+firebase_base64 = os.getenv("FIREBASE_CREDENTIALS_BASE64")
+firebase_dict = json.leads(base64.b64decode(firebase_base64).decode("utf-8"))
+cred = credentials.Certificate(firebase_dict)
 
 # Initialize Firebase only once
 if not firebase_admin._apps:
