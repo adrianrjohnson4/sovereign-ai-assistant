@@ -15,10 +15,10 @@ index_name = os.getenv("PINECONE_INDEX")
 
 if index_name not in pc.list_indexes().names():
     pc.create_index(
-        name=index_name,
-        dimension=1024,  # Use 1536 for "text-embedding-3-large", 1024 for "small"
+         name="sovereign-memory",
+        dimension=1536,
         metric="cosine",
-        spec=ServerlessSpec(cloud="aws", region=os.getenv("PINECONE_ENV"))  # e.g., "us-west-2"
+        spec=ServerlessSpec(cloud="aws", region="us-east-1")
     )
 
 index = pc.Index(index_name)
