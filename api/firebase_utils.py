@@ -6,13 +6,15 @@ from firebase_admin import credentials, firestore, storage
 from uuid import uuid4
 from datetime import datetime, timedelta, timezone, time
 
-firebase_base64 = os.getenv("FIREBASE_CREDENTIALS_BASE64")
-firebase_dict = json.loads(base64.b64decode(firebase_base64).decode("utf-8"))
-cred = credentials.Certificate(firebase_dict)
-
-# Initialize Firebase only once
+# ✅ Decode base64 and initialize once
 if not firebase_admin._apps:
-    cred = credentials.Certificate("firebase_credentials.json")
+    firebase_base64 = os.getenv("FIREBASE_CREDENTIALS_BASE64")
+    if not firebase_base64:
+        raise ValueError("Missing FIREBASE_CREDENTIALS_BASE64 environment variable")
+
+    firebase_dict = json.loads(base64.b64decode(firebase_base64).decode("utf-8"))
+    cred = credentials.Certificate(firebase_dict)
+    
     firebase_admin.initialize_app(cred, {
         'storageBucket': 'sovereignagent-9241b.firebasestorage.app'
     })
