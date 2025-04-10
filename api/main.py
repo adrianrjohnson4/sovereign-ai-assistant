@@ -2,7 +2,8 @@ from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
-from api import task_routes, note_routes
+import task_routes
+import note_routes
 import os
 
 from agents.prioritization_agent import prioritize_tasks, load_goals
