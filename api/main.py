@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from datetime import datetime
+import firebase_admin
 from fastapi.middleware.cors import CORSMiddleware
 import task_routes
 import note_routes
