@@ -11,11 +11,11 @@ client = OpenAI()  # This uses your OPENAI_API_KEY from .env
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
 
 # Connect or create index
-index_name = os.getenv("PINECONE_INDEX")
+index_name = "sovereign-memory"
 
 if index_name not in pc.list_indexes().names():
     pc.create_index(
-         name="sovereign-memory",
+        name=index_name,
         dimension=1536,
         metric="cosine",
         spec=ServerlessSpec(cloud="aws", region="us-east-1")
