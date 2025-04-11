@@ -15,7 +15,7 @@ export default function TaskEntry() {
   const handleAddTask = async () => {
     if (!taskText.trim()) return;
 
-    await fetch("http://localhost:8000/add-task", {
+    await fetch("https://sovereign-backend.onrender.com/add-task", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -36,14 +36,14 @@ export default function TaskEntry() {
   };
 
   const fetchTasks = async () => {
-    const res = await fetch("http://localhost:8000/tasks");
+    const res = await fetch("https://sovereign-backend.onrender.com/tasks");
     const data = await res.json();
     setTasks(data.tasks || []);
   }
 
   const handleToggleStatus = async (taskId, currentStatus) => {
     const newStatus = currentStatus === 'done' ? 'todo' : 'done';
-    await fetch(`http://localhost:8000/update-task-status/${taskId}`, {
+    await fetch(`https://sovereign-backend.onrender.com/update-task-status/${taskId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: newStatus })
@@ -52,7 +52,7 @@ export default function TaskEntry() {
   };
 
   const autoScheduleTasks = async () => {
-    await fetch("http://localhost:8000/auto-schedule-tasks", {
+    await fetch("https://sovereign-backend.onrender.com/auto-schedule-tasks", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' }
     });

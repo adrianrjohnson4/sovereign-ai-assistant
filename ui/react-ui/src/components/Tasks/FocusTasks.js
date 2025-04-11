@@ -6,7 +6,7 @@ export default function FocusTasks({ tasks = [] }) {
 
     useEffect(() => {
       const fetchTopTasks = async () => {
-        const res = await fetch("http://localhost:8000/top-tasks");
+        const res = await fetch("https://sovereign-backend.onrender.com/top-tasks");
         const data = await res.json();
         setFocusTasks(data.top_tasks || []);
         console.log(data)

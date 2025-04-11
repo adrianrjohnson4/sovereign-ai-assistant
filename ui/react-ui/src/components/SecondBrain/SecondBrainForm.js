@@ -33,7 +33,7 @@ function SecondBrainForm() {
         }
 
         try {
-            const response = await fetch('http://localhost:8000/add-note', {
+            const response = await fetch('https://sovereign-backend.onrender.com/add-note', {
                 method: 'POST',
                 body: formData,
             });
