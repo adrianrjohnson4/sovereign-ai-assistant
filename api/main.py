@@ -8,7 +8,6 @@ import os
 import base64
 import tempfile
 from firebase_admin import credentials, initialize_app
-from agents.prioritization_agent import prioritize_tasks, load_goals
 
 if not firebase_admin._apps:
     # Read and decode the base64 credentials
