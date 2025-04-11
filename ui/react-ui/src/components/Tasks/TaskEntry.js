@@ -15,7 +15,7 @@ export default function TaskEntry() {
   const handleAddTask = async () => {
     if (!taskText.trim()) return;
 
-    await fetch("https://sovereign-backend.onrender.com/add-task", {
+    await fetch("https://sovereign-backend.onrender.com/add-task", { // You can also use an environment variable like {REACT_APP_API_BASE_URL} to make switching between local + prod easier.
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
