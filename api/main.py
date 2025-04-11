@@ -31,7 +31,7 @@ app.include_router(note_routes.router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000",
-               "heroic-swan-d79618.netlify.app",    
+               "https://heroic-swan-d79618.netlify.app",    
                    ],
     allow_credentials=True,
     allow_methods=["*"],
